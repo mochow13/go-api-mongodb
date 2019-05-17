@@ -4,7 +4,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// Question model of mongodb
+// Question model of mongodb, json/bson definition tells what is
+// the name of the fields in corresponding objects
 type Question struct {
 	ID              primitive.ObjectID `json:"_id" bson:"_id"`
 	Question        string             `json:"question" bson:"question"`
