@@ -7,8 +7,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/the-flying-dutchman/prostuti-api/controllers"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -22,10 +24,7 @@ type Configuration struct {
 	ModuleSize int
 }
 
-var client *mongo.Client
-var mongoURI string
-
-func buildURI() {
+func buildURI() string {
 	var file, _ = os.Open("env.json")
 	defer file.Close()
 	decoder := json.NewDecoder(file)
@@ -35,31 +34,34 @@ func buildURI() {
 		fmt.Println("Error occurred while reading envs", err)
 	}
 	// fmt.Println(configuration.DBName, configuration.DBPassword)
-	mongoURI = "mongodb://" + config.DBUserName + ":" + config.DBPassword + "@ds155252.mlab.com:55252/" + config.DBName
+	mongoURI := "mongodb://" + config.DBUserName + ":" + config.DBPassword + "@ds155252.mlab.com:55252/" + config.DBName
 	fmt.Println(mongoURI)
+	return mongoURI
 }
 
-func configDB() {
+func configDB(mongoURI string) *mongo.Client {
 	fmt.Println("Starting connection...")
-	// ctx, err := context.WithTimeout(context.Background(), 10*time.Second)
-	// if err != nil {
-	// 	log.Fatal("Error occurred ", err)
-	// }
-	clientOptions := options.Client().ApplyURI(mongoURI)
-	client, errConnect := mongo.Connect(context.TODO(), clientOptions)
-	if errConnect != nil {
-		log.Fatal(errConnect)
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
+	if err != nil {
+		log.Fatal("Error while connecting ", err)
 	}
-	errConnect = client.Ping(context.TODO(), nil)
-	if errConnect != nil {
-		log.Fatal(errConnect)
-	}
+	err = client.Ping(ctx, nil)
 	fmt.Println("Connected to MongoDB!")
+	return client
+}
+
+func defineRoutes(client *mongo.Client) (router *mux.Router) {
+	router = mux.NewRouter()
+	collection := client.Database("memento").Collection("bcs_questions")
+	controllers.Collection = collection
+	router.HandleFunc("/v1/questions/getcount", controllers.GetCount).Methods("GET")
+	return
 }
 
 func main() {
-	buildURI()
-	configDB()
-	router := mux.NewRouter()
+	mongoURI := buildURI()
+	client := configDB(mongoURI)
+	router := defineRoutes(client)
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
