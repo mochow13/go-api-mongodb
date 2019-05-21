@@ -56,10 +56,26 @@ func defineRoutes(client *mongo.Client) (router *mux.Router) {
 	collection := client.Database("memento").Collection("bcs_questions")
 	controllers.Collection = collection
 	router.HandleFunc("/v1/questions/getcount", controllers.GetCount).Methods("GET")
+	router.HandleFunc("/v1/questions/getq", controllers.GetQuestion).Methods("GET")
 	return
 }
 
+type info struct {
+	x int
+}
+
+func (i *info) setX(val int) {
+	(*i).x = val
+}
+
+func dummy() {
+	var I *info = new(info)
+	I.setX(10)
+	fmt.Println(I.x)
+}
+
 func main() {
+	// dummy()
 	mongoURI := buildURI()
 	client := configDB(mongoURI)
 	router := defineRoutes(client)
