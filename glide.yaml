@@ -1,0 +1,9 @@
+package: github.com/the-flying-dutchman/prostuti-api
+import:
+- package: github.com/gorilla/mux
+- package: go.mongodb.org/mongo-driver
+  subpackages:
+  - bson
+  - bson/primitive
+  - mongo
+  - mongo/options
