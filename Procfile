@@ -1,1 +1,1 @@
-web: main
+web: bin/prostuti-api
