@@ -47,6 +47,11 @@ func configDB(mongoURI string) *mongo.Client {
 		log.Fatal("Error while connecting ", err)
 	}
 	err = client.Ping(ctx, nil)
+
+	if err != nil {
+		log.Fatal("Error while pinging to the DB", err)
+	}
+
 	fmt.Println("Connected to MongoDB!")
 	return client
 }
@@ -60,22 +65,7 @@ func defineRoutes(client *mongo.Client) (router *mux.Router) {
 	return
 }
 
-type info struct {
-	x int
-}
-
-func (i *info) setX(val int) {
-	(*i).x = val
-}
-
-func dummy() {
-	var I *info = new(info)
-	I.setX(10)
-	fmt.Println(I.x)
-}
-
 func main() {
-	// dummy()
 	mongoURI := buildURI()
 	client := configDB(mongoURI)
 	router := defineRoutes(client)
