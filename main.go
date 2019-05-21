@@ -69,5 +69,5 @@ func main() {
 	mongoURI := buildURI()
 	client := configDB(mongoURI)
 	router := defineRoutes(client)
-	log.Fatal(http.ListenAndServe(":8000", router))
+	log.Fatal(http.ListenAndServe(os.Getenv("PORT"), router))
 }
