@@ -25,15 +25,22 @@ type Configuration struct {
 }
 
 func buildURI() string {
-	var file, _ = os.Open("envs.json")
+	file, err := os.Open("envs.json")
+
+	if err != nil {
+		mongoURI := "mongodb://" + os.Getenv("DBUserName") + ":" + os.Getenv("DBPassword") + "@ds155252.mlab.com:55252/" + config.DBName
+		return mongoURI
+	}
+
 	defer file.Close()
 	decoder := json.NewDecoder(file)
 	config := Configuration{}
-	err := decoder.Decode(&config)
+	err = decoder.Decode(&config)
+
 	if err != nil {
 		fmt.Println("Error occurred while reading envs", err)
 	}
-	fmt.Println(config.DBName, config.DBPassword)
+
 	mongoURI := "mongodb://" + config.DBUserName + ":" + config.DBPassword + "@ds155252.mlab.com:55252/" + config.DBName
 	fmt.Println(mongoURI)
 	return mongoURI
