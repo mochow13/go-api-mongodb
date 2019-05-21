@@ -28,7 +28,8 @@ func buildURI() string {
 	file, err := os.Open("envs.json")
 
 	if err != nil {
-		mongoURI := "mongodb://" + os.Getenv("DBUserName") + ":" + os.Getenv("DBPassword") + "@ds155252.mlab.com:55252/" + config.DBName
+		mongoURI := "mongodb://" + os.Getenv("DBUserName") +
+			":" + os.Getenv("DBPassword") + "@ds155252.mlab.com:55252/" + os.Getenv("DBName")
 		return mongoURI
 	}
 
@@ -42,7 +43,6 @@ func buildURI() string {
 	}
 
 	mongoURI := "mongodb://" + config.DBUserName + ":" + config.DBPassword + "@ds155252.mlab.com:55252/" + config.DBName
-	fmt.Println(mongoURI)
 	return mongoURI
 }
 
